@@ -1,10 +1,10 @@
 import TaskCard from "./TaskCard";
 
-export default function Todolist({ todos, ...rest }) {
+export default function TodoList({ todos, ...rest }) {
   return (
     <>
       {todos.map((task) => (
-        <TaskCard key={task.id} task={task} {...rest}/>
+        <TaskCard key={task.id} task={task} {...rest} />
       ))}
     </>
   );

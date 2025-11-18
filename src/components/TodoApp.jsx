@@ -1,42 +1,40 @@
 import { useState } from "react";
-import TodoInput from "./Todoinput.jsx";
-import TodoFilters from "./TodoFilters.jsx";
-import TodoList from "./Todolist.jsx";
-import TaskCard from "./TaskCard.jsx";
+import TodoInput from "./Todoinput";
+import TodoFilters from "./TodoFilters";
+import TodoList from "./TodoList";
+import { FILTER, SORT_ORDERS } from "../utils/filterConfig";
+import { sortArray, toggleFilter } from "../utils/filters";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useTodos } from "../hooks/useTodos";
 
 export default function TodoApp() {
-  const [todos, setTodos] = useState([]);
+  //_______________________________________
+  const [todos, setTodos] = useLocalStorage("todo", []);
+  ///_______________________________________________
 
-  const createTask = (text) => {
-    return {
-      id: crypto.randomUUID(),
-      title: text,
-      completed: false,
-      createdAt: new Date(),
-    };
-  };
+  const [filter, setFilter] = useState(FILTER.ALL);
+  const [sortOrder, setSortOrder] = useState(SORT_ORDERS.AZ);
 
-  const addTask = (text) => {
-    setTodos((prev) => [...prev, createTask(text)]);
-  };
-  
-  const deleteTask = (id) => {
-    setTodos(todos.filter((task) => task.id !== id));
-  };
+  const {
+       addTask,
+    deleteTask,
+    toggleComplete,
+    editTask,
+  } = useTodos(todos, setTodos)
 
-  const toggleComplete = (id) => {
-    setTodos((prev) =>
-      prev.map((task) => {
-        return task.id === id ? { ...task, completed: !task.completed } : task;
-      })
-    );
-  };
   return (
+
     <>
       <h1>Velkommen</h1>
       <TodoInput onAdd={addTask} />
-      <TodoFilters />
-      <TodoList todos={todos} onDelete ={deleteTask} onToggle={toggleComplete} />
+      <TodoFilters {...{ filter, setFilter, sortOrder, setSortOrder }} />
+      <TodoList
+        todos={sortArray(toggleFilter(todos, filter), sortOrder)}
+        onDelete={deleteTask}
+        onToggle={toggleComplete}
+        onEdit={editTask}
+      />
     </>
   );
 }
+
